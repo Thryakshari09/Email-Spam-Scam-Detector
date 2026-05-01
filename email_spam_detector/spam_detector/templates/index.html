@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Email Spam & Scam Detector</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <p class="eyebrow">Cybersecurity · Email Analysis</p>
+      <h1>Email Spam &amp; Scam Detector</h1>
+      <p class="subtitle">
+        Paste an email below and we'll analyze it using simple rules and a
+        Naive Bayes machine-learning model.
+      </p>
+    </header>
+
+    <section class="card">
+      <form method="POST" action="/" novalidate>
+        <label for="sender">Sender email <span class="optional">(optional)</span></label>
+        <input
+          type="text"
+          id="sender"
+          name="sender"
+          placeholder="someone@example.com"
+          value="{{ result.sender if result and result.sender else '' }}"
+          maxlength="255"
+        />
+
+        <label for="content">Email content</label>
+        <textarea
+          id="content"
+          name="content"
+          rows="8"
+          placeholder="Paste the full email body here..."
+          maxlength="5000"
+          required>{{ result.content if result and result.content else '' }}</textarea>
+
+        <button type="submit" class="btn">Analyze Email</button>
+      </form>
+
+      {% if result %}
+        <div class="result result-{{ result.verdict }}">
+          <h2>{{ result.label }}</h2>
+          {% if result.source and result.source != 'validation' %}
+            <p class="source">Detected via
+              {{ 'rule-based heuristics' if result.source == 'rules' else 'Naive Bayes ML model' }}
+            </p>
+          {% endif %}
+          {% if result.reasons %}
+            <ul>
+              {% for r in result.reasons %}<li>{{ r }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      {% endif %}
+    </section>
+
+    <footer class="legend">
+      <span class="dot dot-safe"></span> Safe
+      <span class="dot dot-suspicious"></span> Suspicious
+      <span class="dot dot-spam"></span> Spam / Scam
+    </footer>
+  </main>
+</body>
+</html>
